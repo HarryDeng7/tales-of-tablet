@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#FFF7E7">
-  <meta name="description" content="Story Rocket is a bright, interactive storybook shelf for children. Pick a picture book, tap the illustrations, and discover tiny surprise pages.">
-  <title>Story Rocket — Picture books you can tap</title>
+  <meta name="description" content="Story Rocket is a bright, interactive storybook shelf for children. Build a rocket, name it, and send it flying through Johnny’s Mars adventure.">
+  <title>Story Rocket — Build a rocket, read its story</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2318234A'/%3E%3Cpath d='M32 9c8 8 11 19 7 30H25c-4-11-1-22 7-30Z' fill='%23FF6B57'/%3E%3Ccircle cx='32' cy='27' r='6' fill='%23BFEAF7' stroke='%23FFF7E7' stroke-width='2'/%3E%3Cpath d='M23 38l-7 10 9-2M41 38l7 10-9-2' fill='%2325BFA6' stroke='%23FFF7E7' stroke-width='2' stroke-linejoin='round'/%3E%3Cpath d='M28 42h8l-4 12Z' fill='%23FFC83D'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -59,6 +59,10 @@
     <symbol id="icon-check" viewBox="0 0 24 24">
       <path d="M4.5 12.5l5 5 10-11" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
     </symbol>
+    <symbol id="icon-pencil" viewBox="0 0 24 24">
+      <path d="M4 20h4L19 9l-4-4L4 16v4Z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M13.5 6.5l4 4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+    </symbol>
   </svg>
 
   <div class="app" id="app">
@@ -94,14 +98,14 @@
               <h1><span data-i18n="heroLine1">Pick a story.</span><br><em data-i18n="heroLine2">Start an adventure.</em></h1>
               <p class="hero-lede" data-i18n="heroLede">Tap the pictures, turn the pages, and see what pops out.</p>
               <div class="hero-actions">
-                <a class="button button-primary" href="#shelf">
+                <button class="button button-primary" type="button" id="buildRocketBtn">
+                  <svg class="icon" aria-hidden="true"><use href="#icon-rocket"></use></svg>
+                  <span id="buildRocketLabel">Build your rocket</span>
+                </button>
+                <a class="button button-small button-surprise" href="#shelf">
                   <span data-i18n="browseShelf">Browse the shelf</span>
                   <svg class="icon" aria-hidden="true"><use href="#icon-chevron-down"></use></svg>
                 </a>
-                <button class="button button-small button-surprise" id="surpriseBtn">
-                  <svg class="icon" aria-hidden="true"><use href="#icon-shuffle"></use></svg>
-                  <span data-i18n="surprise">Pick one for me</span>
-                </button>
               </div>
             </div>
 
@@ -249,21 +253,21 @@
           <div class="how-grid">
             <article class="how-card">
               <span class="step-number">1</span>
-              <span class="how-icon how-icon-yellow" aria-hidden="true"><svg class="icon"><use href="#icon-book"></use></svg></span>
-              <h3 data-i18n="step1Title">Pick a cover</h3>
-              <p data-i18n="step1Text">All three stories are standing on the shelf, waiting for a reader.</p>
+              <span class="how-icon how-icon-yellow" aria-hidden="true"><svg class="icon"><use href="#icon-rocket"></use></svg></span>
+              <h3 data-i18n="step1Title">Build your rocket</h3>
+              <p data-i18n="step1Text">Name it, choose its colors, and pack one thing for the trip.</p>
             </article>
             <article class="how-card">
               <span class="step-number">2</span>
-              <span class="how-icon how-icon-coral" aria-hidden="true"><svg class="icon"><use href="#icon-sparkles"></use></svg></span>
-              <h3 data-i18n="step2Title">Tap the sparkly spots</h3>
-              <p data-i18n="step2Text">Every picture hides a tiny page. Tap the glowing dots to find out what is inside.</p>
+              <span class="how-icon how-icon-coral" aria-hidden="true"><svg class="icon"><use href="#icon-book"></use></svg></span>
+              <h3 data-i18n="step2Title">Read your story</h3>
+              <p data-i18n="step2Text">Your rocket flies into Johnny’s Mars adventure. Then meet two more tales on the shelf.</p>
             </article>
             <article class="how-card">
               <span class="step-number">3</span>
-              <span class="how-icon how-icon-teal" aria-hidden="true"><svg class="icon"><use href="#icon-arrow-right"></use></svg></span>
-              <h3 data-i18n="step3Title">Turn the page</h3>
-              <p data-i18n="step3Text">Use the big buttons at the bottom when you are ready for what happens next.</p>
+              <span class="how-icon how-icon-teal" aria-hidden="true"><svg class="icon"><use href="#icon-sparkles"></use></svg></span>
+              <h3 data-i18n="step3Title">Tap the sparkly spots</h3>
+              <p data-i18n="step3Text">Every picture hides a tiny page. Tap the glowing dots to find out what is inside.</p>
             </article>
           </div>
         </section>
@@ -340,6 +344,14 @@
                 <svg class="icon" aria-hidden="true"><use href="#icon-sparkles"></use></svg>
                 <span data-i18n="pageNote">Glowing dots hide tiny pages.</span>
               </p>
+              <div class="your-rocket-note" id="yourRocketNote" hidden>
+                <span class="your-rocket-icon" aria-hidden="true"><svg class="icon"><use href="#icon-rocket"></use></svg></span>
+                <p class="your-rocket-text" id="yourRocketLabel"></p>
+                <button class="your-rocket-edit" id="editRocketBtn" type="button">
+                  <svg class="icon" aria-hidden="true"><use href="#icon-pencil"></use></svg>
+                  <span data-i18n="editShort">Edit</span>
+                </button>
+              </div>
               <div class="end-stamp" id="endStamp" data-i18n="endStamp" hidden>The End</div>
             </div>
           </div>
@@ -390,6 +402,7 @@
 
   <script src="js/art-kit.js" defer></script>
   <script src="js/i18n.js" defer></script>
+  <script src="js/creator.js" defer></script>
   <script src="js/book-johnny.js" defer></script>
   <script src="js/book-luna.js" defer></script>
   <script src="js/book-dragon.js" defer></script>

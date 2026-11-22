@@ -747,7 +747,7 @@
     {
       kicker: "Chapter Two",
       title: "The Cardboard Rocket",
-      text: "Johnny dragged boxes out of the garage. A bucket became the nose cone. Cardboard fins went on with forty-seven pieces of tape. Then he painted the whole thing rocket red. “It still needs one thing,” he said. “Imagination.”",
+      text: "Johnny dragged boxes out of the garage. A bucket became the nose cone. Cardboard fins went on with forty-seven pieces of tape. Then he painted the whole thing just the way he wanted. “It still needs one thing,” he said. “Imagination.”",
       art: sceneCardboardRocket(),
       hotspots: [
         {
@@ -772,8 +772,8 @@
           x: 84,
           y: 80,
           label: "Paint",
-          title: "Rocket red",
-          text: "The paint tin said “Barn Red.” Johnny crossed out “Barn” and wrote “ROCKET.” Much better.",
+          title: "A color of your own",
+          text: "The paint tin said “Barn Red.” Johnny crossed out “Barn” and wrote “ROCKET.” Then he picked his favorite color.",
           doodle: "tool",
           accent: "#FF6B57"
         }

@@ -11,7 +11,8 @@
     shelfView: document.getElementById("shelfView"),
     readerView: document.getElementById("readerView"),
     bookGrid: document.getElementById("bookGrid"),
-    surpriseBtn: document.getElementById("surpriseBtn"),
+    buildRocketBtn: document.getElementById("buildRocketBtn"),
+    buildRocketLabel: document.getElementById("buildRocketLabel"),
     readerBookTitle: document.getElementById("readerBookTitle"),
     backToShelf: document.getElementById("backToShelf"),
     readAloud: document.getElementById("readAloud"),
@@ -31,6 +32,9 @@
     progressFill: document.getElementById("progressFill"),
     foundLine: document.getElementById("foundLine"),
     artHint: document.getElementById("artHint"),
+    yourRocketNote: document.getElementById("yourRocketNote"),
+    yourRocketLabel: document.getElementById("yourRocketLabel"),
+    editRocketBtn: document.getElementById("editRocketBtn"),
     readerMain: document.querySelector(".reader-main"),
     tinyBackdrop: document.getElementById("tinyBackdrop"),
     tinyPage: document.getElementById("tinyPage"),
@@ -217,6 +221,7 @@
     updateReadUI();
     renderShelf();
 
+    refreshCreationUI();
     if (currentBook) {
       els.readerBookTitle.textContent = bookField(currentBook, "title");
       renderPage(currentPage, "none");
@@ -273,6 +278,7 @@
       return;
     }
 
+    const rocketDesignReady = Boolean(window.StoryCreator && window.StoryCreator.hasDesign());
     els.bookGrid.innerHTML = books.map(function (book, index) {
       const count = bookFoundCount(book);
       const total = totalSpots(book);
@@ -280,12 +286,17 @@
       const foundBadge = count > 0
         ? '<span class="book-found" title="' + escapeHtml(fmt("foundBadgeTitle", { count: count, total: total })) + '"><svg class="icon" aria-hidden="true"><use href="#icon-star"></use></svg>' + count + "</span>"
         : "";
-      const ribbonValue = bookField(book, "ribbon");
+      let ribbonValue = bookField(book, "ribbon");
+      let openAria = fmt("openBookAria", { title: title });
+      if (book.id === "johnny") {
+        ribbonValue = tr(rocketDesignReady ? "ribbonMine" : "ribbonBuild");
+        if (!rocketDesignReady) openAria = fmt("openBuilderAria", { title: title });
+      }
       const ribbon = ribbonValue ? '<span class="book-ribbon">' + escapeHtml(ribbonValue) + "</span>" : "";
       return '<article class="book-card-wrap">' +
         '<button class="book-card" type="button" data-book-id="' + escapeHtml(book.id) + '"' +
         ' style="--accent:' + book.accent + ";--accent-soft:" + book.accentSoft + ";--tilt:" + book.tilt + ";--delay:" + index * 90 + 'ms"' +
-        ' aria-label="' + escapeHtml(fmt("openBookAria", { title: title })) + '">' +
+        ' aria-label="' + escapeHtml(openAria) + '">' +
           '<span class="book-cover">' +
             '<span class="book-spine" aria-hidden="true"></span>' +
             '<span class="book-art" aria-hidden="true">' + book.cover + "</span>" +
@@ -306,6 +317,8 @@
         "</button>" +
       "</article>";
     }).join("");
+
+    if (window.StoryCreator) window.StoryCreator.decorateSlots(els.bookGrid);
   }
 
   function openBook(book) {
@@ -354,8 +367,8 @@
       const card = els.bookGrid.querySelector('[data-book-id="' + closedBookId + '"]');
       if (card) {
         card.focus({ preventScroll: true });
-      } else if (els.surpriseBtn) {
-        els.surpriseBtn.focus({ preventScroll: true });
+      } else if (els.buildRocketBtn) {
+        els.buildRocketBtn.focus({ preventScroll: true });
       }
     });
     announce(tr("backAnnounce"));
@@ -390,6 +403,7 @@
 
     const pageTitle = pageField(currentBook, index, "title");
     els.pageArt.innerHTML = page.art;
+    if (window.StoryCreator) window.StoryCreator.decorateSlots(els.pageArt);
     els.pageKicker.textContent = pageField(currentBook, index, "kicker");
     els.pageCountChip.textContent = index + 1 + " / " + currentBook.pages.length;
     els.pageTitle.textContent = pageTitle;
@@ -437,6 +451,7 @@
     els.progressFill.style.width = ((index + 1) / currentBook.pages.length) * 100 + "%";
     updateFoundUI();
     updatePageHint();
+    updateRocketNote();
 
     if (direction !== "none") {
       animatePage(direction);
@@ -482,6 +497,48 @@
     label.textContent = foundOnPage === page.hotspots.length
       ? tr("pageAllFound")
       : tr("pageHint");
+  }
+
+  function updateRocketNote() {
+    if (!els.yourRocketNote) return;
+    const creator = window.StoryCreator;
+    const design = creator ? creator.getDesign() : null;
+    const show = Boolean(design && currentBook && currentBook.id === "johnny");
+    els.yourRocketNote.hidden = !show;
+    if (!show) return;
+    els.yourRocketLabel.textContent = fmt("yourRocketNote", {
+      name: design.name,
+      cargo: creator.cargoLabel(design.cargo)
+    });
+    els.editRocketBtn.setAttribute("aria-label", tr("editRocket") + ": " + design.name);
+  }
+
+  function refreshCreationUI() {
+    const hasDesign = Boolean(window.StoryCreator && window.StoryCreator.hasDesign());
+    const label = tr(hasDesign ? "editRocket" : "buildRocket");
+    if (els.buildRocketLabel) els.buildRocketLabel.textContent = label;
+    if (els.buildRocketBtn) els.buildRocketBtn.setAttribute("aria-label", label);
+  }
+
+  function openRocketCreator(options) {
+    if (!window.StoryCreator) return;
+    const settings = options || {};
+    stopSpeech();
+    closeTiny({ restoreFocus: false, silent: true });
+    document.querySelectorAll(".toast").forEach(function (toast) {
+      toast.remove();
+    });
+    playSound("pop");
+    window.StoryCreator.open({
+      context: settings.context === "edit" ? "edit" : "read",
+      afterSave: function (design) {
+        refreshCreationUI();
+        renderShelf();
+        if (currentBook) renderPage(currentPage, "none");
+        playSound("found");
+        if (typeof settings.afterSave === "function") settings.afterSave(design);
+      }
+    });
   }
 
   function nextPage() {
@@ -836,26 +893,33 @@
     const book = books.find(function (item) {
       return item.id === bookId;
     });
-    if (book) openBook(book);
+    if (!book) return;
+    if (book.id === "johnny" && window.StoryCreator && !window.StoryCreator.hasDesign()) {
+      openRocketCreator({
+        context: "read",
+        afterSave: function () {
+          openBook(book);
+        }
+      });
+      return;
+    }
+    openBook(book);
   }
 
-  function handleSurprise() {
-    if (!books.length) return;
-    let options = books;
-    if (books.length > 1) {
-      const current = document.activeElement && document.activeElement.closest
-        ? document.activeElement.closest(".book-card")
-        : null;
-      if (current) {
-        const currentId = current.getAttribute("data-book-id");
-        options = books.filter(function (book) {
-          return book.id !== currentId;
-        });
+  function handleBuildRocket() {
+    const johnny = books.find(function (book) { return book.id === "johnny"; });
+    if (!johnny) return;
+    const hasDesign = window.StoryCreator.hasDesign();
+    openRocketCreator({
+      context: hasDesign ? "edit" : "read",
+      afterSave: hasDesign ? null : function () {
+        openBook(johnny);
       }
-    }
-    const choice = options[Math.floor(Math.random() * options.length)];
-    playSound("pop");
-    openBook(choice);
+    });
+  }
+
+  function handleEditRocket() {
+    openRocketCreator({ context: "edit" });
   }
 
   function handleTinyKeyboard(event) {
@@ -886,6 +950,7 @@
   }
 
   function handleGlobalKeyboard(event) {
+    if (window.StoryCreator && window.StoryCreator.isOpen()) return;
     if (isTinyOpen) {
       handleTinyKeyboard(event);
       return;
@@ -923,6 +988,7 @@
     updateDocumentMeta();
     updateLanguageControls();
     renderShelf();
+    refreshCreationUI();
     updateSoundUI();
     updateReadUI();
 
@@ -932,7 +998,8 @@
 
     document.addEventListener("click", handleLanguageClick);
     els.bookGrid.addEventListener("click", handleBookGridClick);
-    els.surpriseBtn.addEventListener("click", handleSurprise);
+    els.buildRocketBtn.addEventListener("click", handleBuildRocket);
+    els.editRocketBtn.addEventListener("click", handleEditRocket);
     els.backToShelf.addEventListener("click", closeReader);
     els.readAloud.addEventListener("click", speakPage);
     els.soundToggle.addEventListener("click", function () {

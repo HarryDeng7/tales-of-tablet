@@ -250,7 +250,7 @@
           <path d="M-14 2 C-8 25 0 48 0 48 C0 48 8 25 14 2Z" fill="#FFD85E"/>
         </g>`
       : "";
-    return `<g transform="translate(${x} ${y}) scale(${s}) rotate(${o.rotate})">
+    return `<g class="story-rocket-art" data-rocket-face="${o.face ? "1" : "0"}" data-rocket-flame="${o.flame ? "1" : "0"}" transform="translate(${x} ${y}) scale(${s}) rotate(${o.rotate})">
       ${flame}
       <g stroke="${INK}" stroke-width="5.5" stroke-linejoin="round" stroke-linecap="round">
         <path d="M-47 -105 L-96 -39 L-49 -55Z" fill="${o.fin}"/>
