@@ -4,6 +4,8 @@
   const books = Array.isArray(window.STORY_BOOKS) ? window.STORY_BOOKS : [];
   const FOUND_KEY = "story-rocket-found-v1";
   const SOUND_KEY = "story-rocket-sound-v1";
+  const LANG_KEY = "story-rocket-lang-v1";
+  const I18N = window.STORY_I18N || { ui: { en: {}, zh: {} }, booksZh: {} };
 
   const els = {
     shelfView: document.getElementById("shelfView"),
@@ -44,6 +46,7 @@
 
   let found = loadFound();
   let soundEnabled = loadSound();
+  let lang = loadLanguage();
   let currentBook = null;
   let currentPage = 0;
   let isTinyOpen = false;
@@ -105,6 +108,122 @@
     }
   }
 
+  function loadLanguage() {
+    try {
+      const stored = window.localStorage.getItem(LANG_KEY);
+      if (stored === "en" || stored === "zh") return stored;
+    } catch (error) {
+      /* Fall back to the browser language. */
+    }
+    const browserLanguage = (navigator.language || "en").toLowerCase();
+    return browserLanguage.indexOf("zh") === 0 ? "zh" : "en";
+  }
+
+  function saveLanguage() {
+    try {
+      window.localStorage.setItem(LANG_KEY, lang);
+    } catch (error) {
+      /* Language preference is optional. */
+    }
+  }
+
+  function tr(key) {
+    const table = I18N.ui[lang] || I18N.ui.en || {};
+    if (table[key] != null) return table[key];
+    return (I18N.ui.en && I18N.ui.en[key]) || "";
+  }
+
+  function fmt(key, values) {
+    let text = tr(key);
+    const vars = values || {};
+    Object.keys(vars).forEach(function (name) {
+      text = text.split("{" + name + "}").join(String(vars[name]));
+    });
+    return text;
+  }
+
+  function localizedBook(book) {
+    if (lang !== "zh") return null;
+    return I18N.booksZh[book.id] || null;
+  }
+
+  function bookField(book, field) {
+    const translated = localizedBook(book);
+    if (translated && Object.prototype.hasOwnProperty.call(translated, field)) {
+      return translated[field];
+    }
+    return book[field];
+  }
+
+  function pageField(book, pageIndex, field) {
+    const translated = localizedBook(book);
+    const translatedPage = translated && translated.pages && translated.pages[pageIndex];
+    if (translatedPage && translatedPage[field] != null) return translatedPage[field];
+    return book.pages[pageIndex][field];
+  }
+
+  function hotspotField(book, pageIndex, hotspotIndex, field) {
+    const translated = localizedBook(book);
+    const translatedPage = translated && translated.pages && translated.pages[pageIndex];
+    const translatedHotspot = translatedPage && translatedPage.hotspots && translatedPage.hotspots[hotspotIndex];
+    if (translatedHotspot && translatedHotspot[field] != null) return translatedHotspot[field];
+    return book.pages[pageIndex].hotspots[hotspotIndex][field];
+  }
+
+  function applyStaticTranslations() {
+    document.querySelectorAll("[data-i18n]").forEach(function (node) {
+      const text = tr(node.getAttribute("data-i18n"));
+      if (text) node.textContent = text;
+    });
+    document.querySelectorAll("[data-i18n-aria]").forEach(function (node) {
+      const text = tr(node.getAttribute("data-i18n-aria"));
+      if (text) node.setAttribute("aria-label", text);
+    });
+    document.querySelectorAll(".lang-switch").forEach(function (node) {
+      node.setAttribute("aria-label", tr("languageLabel"));
+    });
+  }
+
+  function updateDocumentMeta() {
+    document.title = tr("metaTitle");
+    const description = document.querySelector('meta[name="description"]');
+    if (description) description.setAttribute("content", tr("metaDescription"));
+  }
+
+  function updateLanguageControls() {
+    document.querySelectorAll("[data-lang]").forEach(function (button) {
+      const isActive = button.getAttribute("data-lang") === lang;
+      button.setAttribute("aria-pressed", String(isActive));
+      button.classList.toggle("is-active", isActive);
+    });
+  }
+
+  function setLanguage(nextLanguage) {
+    if (nextLanguage !== "en" && nextLanguage !== "zh") return;
+    if (nextLanguage === lang) return;
+    lang = nextLanguage;
+    saveLanguage();
+    document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
+
+    if (isTinyOpen) closeTiny({ restoreFocus: false, silent: true });
+    document.querySelectorAll(".toast").forEach(function (toast) {
+      toast.remove();
+    });
+    stopSpeech();
+    applyStaticTranslations();
+    updateDocumentMeta();
+    updateLanguageControls();
+    updateSoundUI();
+    updateReadUI();
+    renderShelf();
+
+    if (currentBook) {
+      els.readerBookTitle.textContent = bookField(currentBook, "title");
+      renderPage(currentPage, "none");
+    }
+    announce(tr("languageChanged"));
+  }
+
   function totalSpots(book) {
     return book.pages.reduce(function (count, page) {
       return count + page.hotspots.length;
@@ -150,37 +269,39 @@
   function renderShelf() {
     if (!els.bookGrid) return;
     if (!books.length) {
-      els.bookGrid.innerHTML = '<p class="empty-shelf">The shelf is being restocked. Please check back soon.</p>';
+      els.bookGrid.innerHTML = '<p class="empty-shelf">' + escapeHtml(tr("emptyShelf")) + "</p>";
       return;
     }
 
     els.bookGrid.innerHTML = books.map(function (book, index) {
       const count = bookFoundCount(book);
       const total = totalSpots(book);
+      const title = bookField(book, "title");
       const foundBadge = count > 0
-        ? '<span class="book-found" title="' + count + " of " + total + ' tiny pages found"><svg class="icon" aria-hidden="true"><use href="#icon-star"></use></svg>' + count + "</span>"
+        ? '<span class="book-found" title="' + escapeHtml(fmt("foundBadgeTitle", { count: count, total: total })) + '"><svg class="icon" aria-hidden="true"><use href="#icon-star"></use></svg>' + count + "</span>"
         : "";
-      const ribbon = book.ribbon ? '<span class="book-ribbon">' + escapeHtml(book.ribbon) + "</span>" : "";
+      const ribbonValue = bookField(book, "ribbon");
+      const ribbon = ribbonValue ? '<span class="book-ribbon">' + escapeHtml(ribbonValue) + "</span>" : "";
       return '<article class="book-card-wrap">' +
         '<button class="book-card" type="button" data-book-id="' + escapeHtml(book.id) + '"' +
         ' style="--accent:' + book.accent + ";--accent-soft:" + book.accentSoft + ";--tilt:" + book.tilt + ";--delay:" + index * 90 + 'ms"' +
-        ' aria-label="Open ' + escapeHtml(book.title) + '">' +
+        ' aria-label="' + escapeHtml(fmt("openBookAria", { title: title })) + '">' +
           '<span class="book-cover">' +
             '<span class="book-spine" aria-hidden="true"></span>' +
             '<span class="book-art" aria-hidden="true">' + book.cover + "</span>" +
             ribbon +
             foundBadge +
             '<span class="book-title-panel">' +
-              '<span class="book-tag">' + escapeHtml(book.tag) + "</span>" +
-              '<span class="book-title">' + escapeHtml(book.title) + "</span>" +
-              '<span class="book-author">' + escapeHtml(book.author) + "</span>" +
+              '<span class="book-tag">' + escapeHtml(bookField(book, "tag")) + "</span>" +
+              '<span class="book-title">' + escapeHtml(title) + "</span>" +
+              '<span class="book-author">' + escapeHtml(bookField(book, "author")) + "</span>" +
             "</span>" +
           "</span>" +
           '<span class="book-card-meta">' +
-            '<span><svg class="icon" aria-hidden="true"><use href="#icon-book"></use></svg>' + book.pages.length + " pages</span>" +
+            '<span><svg class="icon" aria-hidden="true"><use href="#icon-book"></use></svg>' + escapeHtml(fmt("pagesCount", { count: book.pages.length })) + "</span>" +
             '<span class="meta-dot" aria-hidden="true">·</span>' +
-            "<span>" + total + " tiny pages</span>" +
-            '<span class="open-pill">Open</span>' +
+            "<span>" + escapeHtml(fmt("tinyPagesCount", { count: total })) + "</span>" +
+            '<span class="open-pill">' + escapeHtml(tr("openLabel")) + "</span>" +
           "</span>" +
         "</button>" +
       "</article>";
@@ -197,7 +318,7 @@
       toast.remove();
     });
 
-    els.readerBookTitle.textContent = book.title;
+    els.readerBookTitle.textContent = bookField(book, "title");
     els.shelfView.hidden = true;
     els.readerView.hidden = false;
     document.body.classList.add("reading");
@@ -209,7 +330,7 @@
 
     renderPage(0, "none");
     playSound("open");
-    announce("Opened " + book.title + ". Page 1 of " + book.pages.length + ".");
+    announce(fmt("openedAnnounce", { title: bookField(book, "title"), total: book.pages.length }));
 
     window.requestAnimationFrame(function () {
       els.backToShelf.focus({ preventScroll: true });
@@ -237,11 +358,12 @@
         els.surpriseBtn.focus({ preventScroll: true });
       }
     });
-    announce("Back to the bookshelf.");
+    announce(tr("backAnnounce"));
   }
 
   function hotspotMarkup(hotspot, pageIndex, hotspotIndex) {
     const alreadyFound = spotFound(pageIndex, hotspotIndex);
+    const label = hotspotField(currentBook, pageIndex, hotspotIndex, "label");
     const classes = ["hotspot"];
     if (alreadyFound) classes.push("is-found");
     if (hotspot.y > 74) classes.push("near-bottom");
@@ -251,9 +373,9 @@
       ' style="--x:' + hotspot.x + "%;--y:" + hotspot.y + "%;--spot:" + (hotspot.accent || currentBook.accent) + '"' +
       ' data-index="' + hotspotIndex + '"' +
       ' aria-haspopup="dialog"' +
-      ' aria-label="Open tiny page: ' + escapeHtml(hotspot.label) + '">' +
+      ' aria-label="' + escapeHtml(fmt("openTinyAria", { label: label })) + '">' +
         '<svg class="icon" aria-hidden="true"><use href="' + (alreadyFound ? "#icon-check" : "#icon-sparkles") + '"></use></svg>' +
-        '<span class="hotspot-label">' + escapeHtml(hotspot.label) + "</span>" +
+        '<span class="hotspot-label">' + escapeHtml(label) + "</span>" +
       "</button>";
   }
 
@@ -266,11 +388,12 @@
     closeTiny({ restoreFocus: false, silent: true });
     currentPage = index;
 
+    const pageTitle = pageField(currentBook, index, "title");
     els.pageArt.innerHTML = page.art;
-    els.pageKicker.textContent = page.kicker;
+    els.pageKicker.textContent = pageField(currentBook, index, "kicker");
     els.pageCountChip.textContent = index + 1 + " / " + currentBook.pages.length;
-    els.pageTitle.textContent = page.title;
-    els.pageText.textContent = page.text;
+    els.pageTitle.textContent = pageTitle;
+    els.pageText.textContent = pageField(currentBook, index, "text");
     els.endStamp.hidden = index !== currentBook.pages.length - 1;
 
     els.hotspots.innerHTML = page.hotspots.map(function (hotspot, hotspotIndex) {
@@ -285,10 +408,11 @@
     });
 
     els.pageDots.innerHTML = currentBook.pages.map(function (dotPage, dotIndex) {
+      const dotTitle = pageField(currentBook, dotIndex, "title");
       return '<button class="page-dot' + (dotIndex === index ? " is-current" : "") + '" type="button"' +
         ' data-page="' + dotIndex + '"' +
         (dotIndex === index ? ' aria-current="page"' : "") +
-        ' aria-label="Go to page ' + (dotIndex + 1) + ": " + escapeHtml(dotPage.title) + '"></button>';
+        ' aria-label="' + escapeHtml(fmt("pageDotAria", { number: dotIndex + 1, title: dotTitle })) + '"></button>';
     }).join("");
 
     els.pageDots.querySelectorAll(".page-dot").forEach(function (dot) {
@@ -304,9 +428,9 @@
 
     els.prevBtn.disabled = index === 0;
     const isLast = index === currentBook.pages.length - 1;
-    els.nextLabel.textContent = isLast ? "Finish story" : "Next page";
+    els.nextLabel.textContent = isLast ? tr("finishStory") : tr("nextPage");
     els.nextBtn.classList.toggle("is-finish", isLast);
-    els.nextBtn.setAttribute("aria-label", isLast ? "Finish the story and return to the shelf" : "Go to the next page");
+    els.nextBtn.setAttribute("aria-label", isLast ? tr("finishAria") : tr("nextAria"));
     const nextIcon = els.nextBtn.querySelector("use");
     if (nextIcon) nextIcon.setAttribute("href", isLast ? "#icon-star" : "#icon-arrow-right");
 
@@ -316,7 +440,7 @@
 
     if (direction !== "none") {
       animatePage(direction);
-      announce("Page " + (index + 1) + " of " + currentBook.pages.length + ". " + page.title + ".");
+      announce(fmt("pageAnnounce", { number: index + 1, total: currentBook.pages.length, title: pageTitle }));
     }
   }
 
@@ -343,8 +467,8 @@
     const count = bookFoundCount(currentBook);
     const total = totalSpots(currentBook);
     els.foundLine.textContent = count === total
-      ? "All " + total + " tiny pages found"
-      : count + " of " + total + " tiny pages found";
+      ? fmt("foundAll", { total: total })
+      : fmt("foundCount", { count: count, total: total });
   }
 
   function updatePageHint() {
@@ -356,8 +480,8 @@
       return spotFound(currentPage, hotspotIndex);
     }).length;
     label.textContent = foundOnPage === page.hotspots.length
-      ? "All tiny pages found here"
-      : "Tap the glowing dots";
+      ? tr("pageAllFound")
+      : tr("pageHint");
   }
 
   function nextPage() {
@@ -383,9 +507,10 @@
     const book = currentBook;
     const count = bookFoundCount(book);
     const total = totalSpots(book);
+    const title = bookField(book, "title");
     const message = count === total
-      ? "The End! You found all " + total + " tiny pages in " + book.title + "."
-      : "The End! You found " + count + " of " + total + " tiny pages in " + book.title + ".";
+      ? fmt("finishAllToast", { total: total, title: title })
+      : fmt("finishSomeToast", { count: count, total: total, title: title });
 
     playSound("finish");
     burst(window.innerWidth / 2, window.innerHeight * 0.34, ["#FFC83D", "#FF6B57", "#25BFA6", "#FFF7E7", "#FF8FB1"], 24);
@@ -413,11 +538,14 @@
     }
 
     const accent = hotspot.accent || currentBook.accent;
+    const spotLabel = hotspotField(currentBook, pageIndex, hotspotIndex, "label");
+    const spotTitle = hotspotField(currentBook, pageIndex, hotspotIndex, "title");
+    const spotText = hotspotField(currentBook, pageIndex, hotspotIndex, "text");
     els.tinyDoodle.innerHTML = window.StoryArt.doodle(hotspot.doodle, accent);
     els.tinyPage.style.setProperty("--tiny-accent", accent);
-    els.tinyKicker.textContent = "A tiny page about " + hotspot.label;
-    els.tinyTitle.textContent = hotspot.title;
-    els.tinyText.textContent = hotspot.text;
+    els.tinyKicker.textContent = fmt("tinyKicker", { label: spotLabel });
+    els.tinyTitle.textContent = spotTitle;
+    els.tinyText.textContent = spotText;
 
     activeTinyTrigger = trigger;
     activeTinyIndex = hotspotIndex;
@@ -444,7 +572,7 @@
       wasFound ? 5 : 10
     );
 
-    announce(hotspot.title + ". " + hotspot.text);
+    announce(spotTitle + ". " + spotText);
     window.requestAnimationFrame(function () {
       els.tinyClose.focus({ preventScroll: true });
     });
@@ -500,8 +628,9 @@
     if (!els.soundToggle) return;
     els.soundToggle.classList.toggle("is-muted", !soundEnabled);
     els.soundToggle.setAttribute("aria-pressed", String(soundEnabled));
-    els.soundToggle.setAttribute("aria-label", soundEnabled ? "Turn sound off" : "Turn sound on");
-    els.soundToggle.title = soundEnabled ? "Turn sound off" : "Turn sound on";
+    const soundLabel = soundEnabled ? tr("soundOffAria") : tr("soundOnAria");
+    els.soundToggle.setAttribute("aria-label", soundLabel);
+    els.soundToggle.title = soundLabel;
     const use = els.soundToggle.querySelector("use");
     if (use) use.setAttribute("href", soundEnabled ? "#icon-music" : "#icon-music-off");
   }
@@ -510,10 +639,11 @@
     if (!els.readAloud) return;
     els.readAloud.classList.toggle("is-active", readSpeaking);
     els.readAloud.setAttribute("aria-pressed", String(readSpeaking));
-    els.readAloud.setAttribute("aria-label", readSpeaking ? "Stop reading this page" : "Read this page aloud");
-    els.readAloud.title = readSpeaking ? "Stop reading this page" : "Read this page aloud";
+    const readLabel = readSpeaking ? tr("stopReadAria") : tr("readAria");
+    els.readAloud.setAttribute("aria-label", readLabel);
+    els.readAloud.title = readLabel;
     const label = els.readAloud.querySelector(".reader-action-label");
-    if (label) label.textContent = readSpeaking ? "Stop reading" : "Read to me";
+    if (label) label.textContent = readSpeaking ? tr("stopReading") : tr("readToMe");
   }
 
   function speakPage() {
@@ -528,10 +658,18 @@
     window.speechSynthesis.cancel();
     speechToken += 1;
     const token = speechToken;
-    const utterance = new SpeechSynthesisUtterance(page.title + ". " + page.text);
+    const pageTitle = pageField(currentBook, currentPage, "title");
+    const pageText = pageField(currentBook, currentPage, "text");
+    const utterance = new SpeechSynthesisUtterance(pageTitle + ". " + pageText);
+    utterance.lang = lang === "zh" ? "zh-CN" : "en-US";
     utterance.rate = 0.9;
     utterance.pitch = 1.08;
     utterance.volume = 1;
+    const voices = window.speechSynthesis.getVoices ? window.speechSynthesis.getVoices() : [];
+    const matchingVoice = voices.find(function (voice) {
+      return (voice.lang || "").toLowerCase().indexOf(lang === "zh" ? "zh" : "en") === 0;
+    });
+    if (matchingVoice) utterance.voice = matchingVoice;
     utterance.onend = function () {
       if (token !== speechToken) return;
       readSpeaking = false;
@@ -672,7 +810,7 @@
     toast.className = "toast";
     toast.innerHTML = '<span class="toast-icon" aria-hidden="true"><svg class="icon"><use href="#icon-star"></use></svg></span>' +
       '<p class="toast-message"></p>' +
-      '<button class="toast-close" type="button" aria-label="Close message"><svg class="icon" aria-hidden="true"><use href="#icon-close"></use></svg></button>';
+      '<button class="toast-close" type="button" aria-label="' + escapeHtml(tr("closeMessageAria")) + '"><svg class="icon" aria-hidden="true"><use href="#icon-close"></use></svg></button>';
     toast.querySelector(".toast-message").textContent = message;
     document.body.appendChild(toast);
 
@@ -741,6 +879,12 @@
     }
   }
 
+  function handleLanguageClick(event) {
+    const button = event.target.closest("[data-lang]");
+    if (!button) return;
+    setLanguage(button.getAttribute("data-lang"));
+  }
+
   function handleGlobalKeyboard(event) {
     if (isTinyOpen) {
       handleTinyKeyboard(event);
@@ -774,6 +918,10 @@
   }
 
   function init() {
+    document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
+    applyStaticTranslations();
+    updateDocumentMeta();
+    updateLanguageControls();
     renderShelf();
     updateSoundUI();
     updateReadUI();
@@ -782,6 +930,7 @@
       els.readAloud.hidden = true;
     }
 
+    document.addEventListener("click", handleLanguageClick);
     els.bookGrid.addEventListener("click", handleBookGridClick);
     els.surpriseBtn.addEventListener("click", handleSurprise);
     els.backToShelf.addEventListener("click", closeReader);
@@ -792,9 +941,9 @@
       updateSoundUI();
       if (soundEnabled) {
         playSound("pop");
-        announce("Sound on.");
+        announce(tr("soundOnAnnounce"));
       } else {
-        announce("Sound off.");
+        announce(tr("soundOffAnnounce"));
       }
     });
     els.prevBtn.addEventListener("click", previousPage);

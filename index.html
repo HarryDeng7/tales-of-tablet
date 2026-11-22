@@ -64,16 +64,22 @@
   <div class="app" id="app">
     <div class="shelf-view" id="shelfView">
       <header class="site-header">
-        <a class="brand" href="#" aria-label="Story Rocket home">
+        <a class="brand" href="#" aria-label="Story Rocket home" data-i18n-aria="brandHomeAria">
           <span class="brand-mark" aria-hidden="true">
             <svg viewBox="0 0 24 24"><use href="#icon-rocket"></use></svg>
           </span>
           <span class="brand-name">Story<span>Rocket</span></span>
         </a>
-        <p class="header-tip">
-          <svg class="icon" aria-hidden="true"><use href="#icon-sparkles"></use></svg>
-          <span>Tap the glowing dots inside every story</span>
-        </p>
+        <div class="header-tools">
+          <p class="header-tip">
+            <svg class="icon" aria-hidden="true"><use href="#icon-sparkles"></use></svg>
+            <span data-i18n="headerTip">Tap the glowing dots inside every story</span>
+          </p>
+          <div class="lang-switch" role="group" aria-label="Language" data-i18n-aria="languageLabel">
+            <button class="lang-btn" type="button" data-lang="en" lang="en" aria-pressed="true">EN</button>
+            <button class="lang-btn" type="button" data-lang="zh" lang="zh-CN" aria-pressed="false">中文</button>
+          </div>
+        </div>
       </header>
 
       <main>
@@ -84,17 +90,17 @@
           <div class="hero-star hero-star-two" aria-hidden="true"></div>
           <div class="hero-inner">
             <div class="hero-copy">
-              <p class="eyebrow"><span class="eyebrow-dot"></span>A storybook shelf for curious kids</p>
-              <h1>Pick a story.<br><em>Start an adventure.</em></h1>
-              <p class="hero-lede">Tap the pictures, turn the pages, and see what pops out.</p>
+              <p class="eyebrow"><span class="eyebrow-dot"></span><span data-i18n="heroEyebrow">A storybook shelf for curious kids</span></p>
+              <h1><span data-i18n="heroLine1">Pick a story.</span><br><em data-i18n="heroLine2">Start an adventure.</em></h1>
+              <p class="hero-lede" data-i18n="heroLede">Tap the pictures, turn the pages, and see what pops out.</p>
               <div class="hero-actions">
                 <a class="button button-primary" href="#shelf">
-                  Browse the shelf
+                  <span data-i18n="browseShelf">Browse the shelf</span>
                   <svg class="icon" aria-hidden="true"><use href="#icon-chevron-down"></use></svg>
                 </a>
                 <button class="button button-small button-surprise" id="surpriseBtn">
                   <svg class="icon" aria-hidden="true"><use href="#icon-shuffle"></use></svg>
-                  Pick one for me
+                  <span data-i18n="surprise">Pick one for me</span>
                 </button>
               </div>
             </div>
@@ -190,13 +196,13 @@
           <div class="shelf-heading">
             <h2 id="shelfTitle">
               <svg class="icon" aria-hidden="true"><use href="#icon-sparkles"></use></svg>
-              Today's shelf
+              <span data-i18n="shelfTitle">Today's shelf</span>
             </h2>
-            <p>Three picture books. Choose a cover to start.</p>
+            <p data-i18n="shelfNote">Three picture books. Choose a cover to start.</p>
           </div>
           <p class="shelf-swipe-hint">
             <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"></use></svg>
-            Swipe the shelf to see all three books.
+            <span data-i18n="swipeHint">Swipe the shelf to see all three books.</span>
           </p>
 
           <div class="bookcase">
@@ -236,28 +242,28 @@
         <section class="how-section" aria-labelledby="howTitle">
           <div class="section-heading section-heading-centered">
             <div>
-              <p class="eyebrow"><span class="eyebrow-dot eyebrow-dot-coral"></span>How it works</p>
-              <h2 id="howTitle">Three little steps</h2>
+              <p class="eyebrow"><span class="eyebrow-dot eyebrow-dot-coral"></span><span data-i18n="howEyebrow">How it works</span></p>
+              <h2 id="howTitle" data-i18n="howTitle">Three little steps</h2>
             </div>
           </div>
           <div class="how-grid">
             <article class="how-card">
               <span class="step-number">1</span>
               <span class="how-icon how-icon-yellow" aria-hidden="true"><svg class="icon"><use href="#icon-book"></use></svg></span>
-              <h3>Pick a cover</h3>
-              <p>All three stories are standing on the shelf, waiting for a reader.</p>
+              <h3 data-i18n="step1Title">Pick a cover</h3>
+              <p data-i18n="step1Text">All three stories are standing on the shelf, waiting for a reader.</p>
             </article>
             <article class="how-card">
               <span class="step-number">2</span>
               <span class="how-icon how-icon-coral" aria-hidden="true"><svg class="icon"><use href="#icon-sparkles"></use></svg></span>
-              <h3>Tap the sparkly spots</h3>
-              <p>Every picture hides a tiny page. Tap the glowing dots to find out what is inside.</p>
+              <h3 data-i18n="step2Title">Tap the sparkly spots</h3>
+              <p data-i18n="step2Text">Every picture hides a tiny page. Tap the glowing dots to find out what is inside.</p>
             </article>
             <article class="how-card">
               <span class="step-number">3</span>
               <span class="how-icon how-icon-teal" aria-hidden="true"><svg class="icon"><use href="#icon-arrow-right"></use></svg></span>
-              <h3>Turn the page</h3>
-              <p>Use the big buttons at the bottom when you are ready for what happens next.</p>
+              <h3 data-i18n="step3Title">Turn the page</h3>
+              <p data-i18n="step3Text">Use the big buttons at the bottom when you are ready for what happens next.</p>
             </article>
           </div>
         </section>
@@ -265,27 +271,31 @@
         <footer class="site-footer">
           <div class="footer-signature">
             <span class="brand-mark brand-mark-small" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-rocket"></use></svg></span>
-            <p><strong>Story Rocket</strong> — made for reading together.</p>
+            <p><strong data-i18n="footerBrand">Story Rocket</strong><span data-i18n="footerByline"> — made for reading together.</span></p>
           </div>
-          <p class="footer-note">No ads. No accounts. Just stories.</p>
+          <p class="footer-note" data-i18n="footerNote">No ads. No accounts. Just stories.</p>
         </footer>
       </main>
     </div>
 
-    <section class="reader-view" id="readerView" aria-label="Story reader" hidden>
+    <section class="reader-view" id="readerView" aria-label="Story reader" data-i18n-aria="readerAria" hidden>
       <header class="reader-bar">
-        <button class="reader-back" id="backToShelf" aria-label="Back to the bookshelf">
+        <button class="reader-back" id="backToShelf" aria-label="Back to the bookshelf" data-i18n-aria="backAria">
           <svg class="icon" aria-hidden="true"><use href="#icon-arrow-left"></use></svg>
-          <span>Shelf</span>
+          <span data-i18n="readerBack">Shelf</span>
         </button>
         <div class="reader-book-id">
-          <p class="reader-brand">Story Rocket</p>
+          <p class="reader-brand" data-i18n="readerBrand">Story Rocket</p>
           <p id="readerBookTitle">Johnny Builds to Mars</p>
         </div>
         <div class="reader-actions">
-          <button class="reader-action" id="readAloud" aria-pressed="false">
+          <div class="lang-switch lang-switch-reader" role="group" aria-label="Language" data-i18n-aria="languageLabel">
+            <button class="lang-btn" type="button" data-lang="en" lang="en" aria-pressed="true">EN</button>
+            <button class="lang-btn" type="button" data-lang="zh" lang="zh-CN" aria-pressed="false">中文</button>
+          </div>
+          <button class="reader-action" id="readAloud" aria-pressed="false" aria-label="Read this page aloud">
             <svg class="icon" aria-hidden="true"><use href="#icon-speaker"></use></svg>
-            <span class="reader-action-label">Read to me</span>
+            <span class="reader-action-label" data-i18n="readToMe">Read to me</span>
           </button>
           <button class="reader-action reader-sound" id="soundToggle" aria-pressed="true" aria-label="Turn sound off" title="Turn sound off">
             <svg class="icon" aria-hidden="true"><use href="#icon-music"></use></svg>
@@ -312,7 +322,7 @@
                 <div class="hotspots" id="hotspots"></div>
                 <div class="art-hint" id="artHint">
                   <svg class="icon" aria-hidden="true"><use href="#icon-sparkles"></use></svg>
-                  <span>Tap the glowing dots</span>
+                  <span data-i18n="pageHint">Tap the glowing dots</span>
                 </div>
               </div>
             </div>
@@ -328,29 +338,29 @@
               </div>
               <p class="copy-note">
                 <svg class="icon" aria-hidden="true"><use href="#icon-sparkles"></use></svg>
-                <span>Glowing dots hide tiny pages.</span>
+                <span data-i18n="pageNote">Glowing dots hide tiny pages.</span>
               </p>
-              <div class="end-stamp" id="endStamp" hidden>The End</div>
+              <div class="end-stamp" id="endStamp" data-i18n="endStamp" hidden>The End</div>
             </div>
           </div>
         </div>
       </main>
 
       <footer class="reader-nav">
-        <button class="turn-button turn-prev" id="prevBtn" aria-label="Go to the previous page">
+        <button class="turn-button turn-prev" id="prevBtn" aria-label="Go to the previous page" data-i18n-aria="prevAria">
           <svg class="icon" aria-hidden="true"><use href="#icon-arrow-left"></use></svg>
-          <span>Back</span>
+          <span data-i18n="prevLabel">Back</span>
         </button>
         <div class="page-status">
-          <div class="page-dots" id="pageDots" aria-label="Choose a page"></div>
+          <div class="page-dots" id="pageDots" aria-label="Choose a page" data-i18n-aria="pageDotsLabel"></div>
           <div class="progress-track" aria-hidden="true"><span id="progressFill"></span></div>
           <p class="found-line">
             <svg class="icon" aria-hidden="true"><use href="#icon-star"></use></svg>
             <span id="foundLine">0 tiny pages found</span>
           </p>
         </div>
-        <button class="turn-button turn-next" id="nextBtn">
-          <span id="nextLabel">Next page</span>
+        <button class="turn-button turn-next" id="nextBtn" aria-label="Go to the next page">
+          <span id="nextLabel" data-i18n="nextPage">Next page</span>
           <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"></use></svg>
         </button>
       </footer>
@@ -361,24 +371,25 @@
   <div class="tiny-page" id="tinyPage" role="dialog" aria-modal="true" aria-labelledby="tinyTitle" hidden>
     <span class="tape tape-one" aria-hidden="true"></span>
     <span class="tape tape-two" aria-hidden="true"></span>
-    <button class="tiny-close" id="tinyClose" aria-label="Close tiny page">
+    <button class="tiny-close" id="tinyClose" aria-label="Close tiny page" data-i18n-aria="closeTinyAria">
       <svg class="icon" aria-hidden="true"><use href="#icon-close"></use></svg>
     </button>
     <div class="tiny-doodle" id="tinyDoodle" aria-hidden="true"></div>
     <p class="tiny-kicker" id="tinyKicker">A tiny page</p>
     <h2 id="tinyTitle">Surprise</h2>
     <p class="tiny-text" id="tinyText"></p>
-    <button class="tiny-done" id="tinyDone">Back to the story</button>
+    <button class="tiny-done" id="tinyDone" data-i18n="tinyBack">Back to the story</button>
   </div>
 
   <div class="fx-layer" id="fxLayer" aria-hidden="true"></div>
   <p class="sr-only" id="liveRegion" aria-live="polite"></p>
 
   <noscript>
-    <div class="noscript">Story Rocket needs JavaScript to turn the pages. Please turn it on and refresh.</div>
+    <div class="noscript">Story Rocket needs JavaScript to turn the pages. / 故事火箭需要启用 JavaScript 才能翻页。</div>
   </noscript>
 
   <script src="js/art-kit.js" defer></script>
+  <script src="js/i18n.js" defer></script>
   <script src="js/book-johnny.js" defer></script>
   <script src="js/book-luna.js" defer></script>
   <script src="js/book-dragon.js" defer></script>
