@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#FFF7E7">
+  <meta name="description" content="Story Rocket is a bright, interactive storybook shelf for children. Pick a picture book, tap the illustrations, and discover tiny surprise pages.">
+  <title>Story Rocket — Picture books you can tap</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2318234A'/%3E%3Cpath d='M32 9c8 8 11 19 7 30H25c-4-11-1-22 7-30Z' fill='%23FF6B57'/%3E%3Ccircle cx='32' cy='27' r='6' fill='%23BFEAF7' stroke='%23FFF7E7' stroke-width='2'/%3E%3Cpath d='M23 38l-7 10 9-2M41 38l7 10-9-2' fill='%2325BFA6' stroke='%23FFF7E7' stroke-width='2' stroke-linejoin='round'/%3E%3Cpath d='M28 42h8l-4 12Z' fill='%23FFC83D'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <svg class="icon-sprite" aria-hidden="true" focusable="false">
+    <symbol id="icon-arrow-right" viewBox="0 0 24 24">
+      <path d="M4 12h15M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="icon-arrow-left" viewBox="0 0 24 24">
+      <path d="M20 12H5M11 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="icon-chevron-down" viewBox="0 0 24 24">
+      <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="icon-close" viewBox="0 0 24 24">
+      <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="icon-star" viewBox="0 0 24 24">
+      <path d="M12 2.6l2.8 5.9 6.4.8-4.7 4.4 1.2 6.3L12 17l-5.7 3-1.2-6.3L.4 9.3l6.4-.8L12 2.6Z" fill="currentColor"/>
+    </symbol>
+    <symbol id="icon-sparkles" viewBox="0 0 24 24">
+      <path d="M10 2l1.4 4.6L16 8l-4.6 1.4L10 14l-1.4-4.6L4 8l4.6-1.4L10 2Z" fill="currentColor"/>
+      <path d="M18.5 13l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9.9-2.6Z" fill="currentColor"/>
+    </symbol>
+    <symbol id="icon-speaker" viewBox="0 0 24 24">
+      <path d="M4 9v6h4l5 4V5L8 9H4Z" fill="currentColor"/>
+      <path d="M16 8c1.6 1.2 2.5 2.5 2.5 4S17.6 14.8 16 16M18.8 5.5c2.3 2 3.7 4.2 3.7 6.5s-1.4 4.5-3.7 6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="icon-speaker-off" viewBox="0 0 24 24">
+      <path d="M4 9v6h4l5 4V5L8 9H4Z" fill="currentColor"/>
+      <path d="M17 9l5 6M22 9l-5 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="icon-music" viewBox="0 0 24 24">
+      <path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6Z" fill="currentColor"/>
+    </symbol>
+    <symbol id="icon-music-off" viewBox="0 0 24 24">
+      <path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6Z" fill="currentColor"/>
+      <path d="M4 4l16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="icon-shuffle" viewBox="0 0 24 24">
+      <path d="M3 6h3.2c4.4 0 5.2 12 9.8 12H21M17 14l4 4-4 4M3 18h3.2c1.8 0 3-2 4.2-4.3M14.6 7.7C15.5 6.6 16.4 6 17.5 6H21M17 2l4 4-4 4" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="icon-book" viewBox="0 0 24 24">
+      <path d="M3 5.5c3.5-.9 6.5-.3 9 1.5v13c-2.5-1.8-5.5-2.4-9-1.5v-13ZM21 5.5c-3.5-.9-6.5-.3-9 1.5v13c2.5-1.8 5.5-2.4 9-1.5v-13Z" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="icon-rocket" viewBox="0 0 24 24">
+      <path d="M12 2c4.2 3.8 6 8.3 5.1 13.8H6.9C6 10.3 7.8 5.8 12 2Z" fill="currentColor"/>
+      <circle cx="12" cy="8.7" r="2.4" fill="none" stroke="white" stroke-width="1.5"/>
+      <path d="M7 13l-3.5 5 4.6-1.1M17 13l3.5 5-4.6-1.1M10 16h4l-2 6-2-6Z" fill="currentColor"/>
+    </symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24">
+      <path d="M4.5 12.5l5 5 10-11" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+  </svg>
+
+  <div class="app" id="app">
+    <div class="shelf-view" id="shelfView">
+      <header class="site-header">
+        <a class="brand" href="#" aria-label="Story Rocket home">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><use href="#icon-rocket"></use></svg>
+          </span>
+          <span class="brand-name">Story<span>Rocket</span></span>
+        </a>
+        <p class="header-tip">
+          <svg class="icon" aria-hidden="true"><use href="#icon-sparkles"></use></svg>
+          <span>Tap the glowing dots inside every story</span>
+        </p>
+      </header>
+
+      <main>
+        <section class="hero">
+          <div class="hero-cloud cloud-one" aria-hidden="true"></div>
+          <div class="hero-cloud cloud-two" aria-hidden="true"></div>
+          <div class="hero-star hero-star-one" aria-hidden="true"></div>
+          <div class="hero-star hero-star-two" aria-hidden="true"></div>
+          <div class="hero-inner">
+            <div class="hero-copy">
+              <p class="eyebrow"><span class="eyebrow-dot"></span>A storybook shelf for curious kids</p>
+              <h1>Pick a story.<br><em>Start an adventure.</em></h1>
+              <p class="hero-lede">Tap the pictures, turn the pages, and see what pops out.</p>
+              <div class="hero-actions">
+                <a class="button button-primary" href="#shelf">
+                  Browse the shelf
+                  <svg class="icon" aria-hidden="true"><use href="#icon-chevron-down"></use></svg>
+                </a>
+                <button class="button button-small button-surprise" id="surpriseBtn">
+                  <svg class="icon" aria-hidden="true"><use href="#icon-shuffle"></use></svg>
+                  Pick one for me
+                </button>
+              </div>
+            </div>
+
+            <div class="hero-art" aria-hidden="true">
+              <svg class="hero-illustration" viewBox="0 0 560 480" role="img">
+                <defs>
+                  <linearGradient id="heroBody" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0" stop-color="#FF8A70"/>
+                    <stop offset="0.55" stop-color="#FF6B57"/>
+                    <stop offset="1" stop-color="#EF4E45"/>
+                  </linearGradient>
+                  <linearGradient id="heroSky" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#D8F5FF"/>
+                    <stop offset="1" stop-color="#A9E6FF"/>
+                  </linearGradient>
+                </defs>
+                <circle cx="284" cy="244" r="204" fill="url(#heroSky)" opacity="0.55"/>
+                <path d="M82 329c29-37 82-55 119-35 17-49 78-71 120-41 29-32 85-29 107 10 37 3 64 26 71 55 28 3 44 27 33 50H70c-20-7-10-31 12-39Z" fill="#FFFDF5" opacity="0.66"/>
+                <g class="hero-planet">
+                  <ellipse cx="453" cy="89" rx="47" ry="14" fill="none" stroke="#26324B" stroke-width="5" transform="rotate(-18 453 89)"/>
+                  <circle cx="453" cy="89" r="46" fill="#FFB85C" stroke="#26324B" stroke-width="5"/>
+                  <circle cx="438" cy="73" r="9" fill="#EA8B45" opacity="0.8"/>
+                  <circle cx="469" cy="105" r="12" fill="#EA8B45" opacity="0.65"/>
+                  <circle cx="464" cy="70" r="5" fill="#FFD68F" opacity="0.9"/>
+                </g>
+                <g class="hero-star hero-star-three">
+                  <path d="M75 102l5.7 15.3L96 123l-15.3 5.7L75 144l-5.7-15.3L54 123l15.3-5.7L75 102Z" fill="#FFC83D" stroke="#26324B" stroke-width="4" stroke-linejoin="round"/>
+                </g>
+                <g class="hero-star hero-star-four">
+                  <path d="M500 240l3.8 10.2L514 254l-10.2 3.8L500 268l-3.8-10.2L486 254l10.2-3.8L500 240Z" fill="#FFFDF5" stroke="#26324B" stroke-width="3" stroke-linejoin="round"/>
+                </g>
+                <g class="hero-star hero-star-five">
+                  <circle cx="137" cy="226" r="7" fill="#25BFA6" stroke="#26324B" stroke-width="3"/>
+                </g>
+
+                <g class="hero-rocket">
+                  <g transform="rotate(-3 280 250)">
+                    <path d="M213 158l-18 76 18-23 9 29 21-82Z" fill="#25BFA6" stroke="#26324B" stroke-width="6" stroke-linejoin="round"/>
+                    <path d="M347 158l18 76-18-23-9 29-21-82Z" fill="#25BFA6" stroke="#26324B" stroke-width="6" stroke-linejoin="round"/>
+                    <path d="M280 69c49 37 72 96 62 208h-124c-10-112 13-171 62-208Z" fill="url(#heroBody)" stroke="#26324B" stroke-width="7"/>
+                    <path d="M280 69c21 16 37 36 48 63h-96c11-27 27-47 48-63Z" fill="#FFE0A6" stroke="#26324B" stroke-width="6" stroke-linejoin="round"/>
+                    <circle cx="280" cy="193" r="52" fill="#C7EFF7" stroke="#26324B" stroke-width="7"/>
+                    <circle cx="280" cy="193" r="40" fill="#E9FBFF"/>
+                    <path d="M263 189c0-5 4-9 9-9s9 4 9 9M296 189c0-5 4-9 9-9s9 4 9 9" fill="none" stroke="#26324B" stroke-width="5" stroke-linecap="round"/>
+                    <path d="M270 207c7 8 16 8 22 0" fill="none" stroke="#26324B" stroke-width="5" stroke-linecap="round"/>
+                    <circle cx="260" cy="203" r="6" fill="#FF9CAB" opacity="0.8"/>
+                    <circle cx="302" cy="203" r="6" fill="#FF9CAB" opacity="0.8"/>
+                    <path d="M236 249h88M231 270h98" fill="none" stroke="#D9463F" stroke-width="6" stroke-linecap="round" opacity="0.7"/>
+                    <circle cx="254" cy="163" r="4" fill="#FFF7E7"/>
+                    <circle cx="306" cy="163" r="4" fill="#FFF7E7"/>
+                  </g>
+                  <g class="hero-puff">
+                    <circle cx="201" cy="343" r="21" fill="#FFFDF5" stroke="#26324B" stroke-width="5"/>
+                    <circle cx="164" cy="358" r="13" fill="#FFFDF5" stroke="#26324B" stroke-width="4"/>
+                    <circle cx="359" cy="343" r="18" fill="#FFFDF5" stroke="#26324B" stroke-width="5"/>
+                  </g>
+                </g>
+
+                <g class="hero-books">
+                  <g transform="rotate(-2 280 368)">
+                    <rect x="142" y="340" width="276" height="48" rx="10" fill="#4B7BFF" stroke="#26324B" stroke-width="6"/>
+                    <rect x="157" y="349" width="10" height="30" rx="5" fill="#AFC4FF"/>
+                    <path d="M394 340v48" stroke="#26324B" stroke-width="4" opacity="0.35"/>
+                    <path d="M300 344c12 7 24 6 36-2" fill="none" stroke="#FFF7E7" stroke-width="5" stroke-linecap="round" opacity="0.8"/>
+                  </g>
+                  <g transform="rotate(1.6 280 394)">
+                    <rect x="166" y="388" width="250" height="45" rx="10" fill="#FFC83D" stroke="#26324B" stroke-width="6"/>
+                    <rect x="181" y="396" width="9" height="28" rx="4" fill="#FFF0B0"/>
+                    <path d="M368 388v45" stroke="#26324B" stroke-width="4" opacity="0.3"/>
+                    <path d="M246 392c12 6 22 5 34-2" fill="none" stroke="#26324B" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
+                    <path d="M348 388v22l12-8 12 8v-22" fill="#FF6B57" stroke="#26324B" stroke-width="3.5" stroke-linejoin="round"/>
+                  </g>
+                  <g transform="rotate(-1.4 280 425)">
+                    <rect x="128" y="433" width="304" height="46" rx="10" fill="#25BFA6" stroke="#26324B" stroke-width="6"/>
+                    <rect x="144" y="441" width="9" height="29" rx="4" fill="#A8F1E4"/>
+                    <path d="M416 433v46" stroke="#26324B" stroke-width="4" opacity="0.35"/>
+                    <path d="M290 437c14 8 27 7 40-2" fill="none" stroke="#FFF7E7" stroke-width="4.5" stroke-linecap="round" opacity="0.75"/>
+                  </g>
+                  <ellipse cx="281" cy="478" rx="178" ry="9" fill="#26324B" opacity="0.14"/>
+                </g>
+                <g class="hero-sparkle" fill="none" stroke="#26324B" stroke-width="4" stroke-linecap="round">
+                  <path d="M449 302l-4 16M457 317l-2 12M477 321l10 5"/>
+                  <path d="M94 293l-8 10M83 302l-11 3M81 316l-7 10"/>
+                  <path d="M353 46l2 12M362 54l9 3M342 58l-8 4"/>
+                </g>
+              </svg>
+            </div>
+          </div>
+        </section>
+
+        <section class="shelf-section" id="shelf" aria-labelledby="shelfTitle">
+          <div class="shelf-heading">
+            <h2 id="shelfTitle">
+              <svg class="icon" aria-hidden="true"><use href="#icon-sparkles"></use></svg>
+              Today's shelf
+            </h2>
+            <p>Three picture books. Choose a cover to start.</p>
+          </div>
+          <p class="shelf-swipe-hint">
+            <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"></use></svg>
+            Swipe the shelf to see all three books.
+          </p>
+
+          <div class="bookcase">
+            <div class="bunting" aria-hidden="true">
+              <span class="bunting-string"></span>
+              <span class="flag flag-coral"></span>
+              <span class="flag flag-yellow"></span>
+              <span class="flag flag-teal"></span>
+              <span class="flag flag-blue"></span>
+              <span class="flag flag-pink"></span>
+              <span class="flag flag-coral"></span>
+              <span class="flag flag-yellow"></span>
+            </div>
+            <div class="book-grid" id="bookGrid"></div>
+            <div class="shelf-plank" aria-hidden="true">
+              <span class="plank-highlight"></span>
+            </div>
+            <div class="shelf-doodle shelf-doodle-plant" aria-hidden="true">
+              <svg viewBox="0 0 100 110">
+                <path d="M34 58c-14-2-24-11-26-23 15-2 27 5 31 18M53 55c2-17 11-30 25-37 4 16-3 30-18 39" fill="#8FD3A8" stroke="#26324B" stroke-width="4" stroke-linejoin="round"/>
+                <path d="M52 78c1-20 1-31-3-45M50 58c-6-12-13-18-23-21M53 50c8-9 15-14 24-17" fill="none" stroke="#26324B" stroke-width="4" stroke-linecap="round"/>
+                <path d="M27 69h47l-6 33H33Z" fill="#FFC83D" stroke="#26324B" stroke-width="4.5" stroke-linejoin="round"/>
+                <path d="M24 64h53v12H24Z" fill="#FF8A3D" stroke="#26324B" stroke-width="4.5" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="shelf-doodle shelf-doodle-rocket" aria-hidden="true">
+              <svg viewBox="0 0 100 100">
+                <path d="M50 10c18 15 25 34 21 58H29C25 44 32 25 50 10Z" fill="#FF6B57" stroke="#26324B" stroke-width="4.5"/>
+                <circle cx="50" cy="42" r="12" fill="#C7EFF7" stroke="#26324B" stroke-width="4"/>
+                <path d="M31 49l-14 19 16-4M69 49l14 19-16-4" fill="#25BFA6" stroke="#26324B" stroke-width="4" stroke-linejoin="round"/>
+                <path d="M41 68h18l-9 23Z" fill="#FFC83D" stroke="#26324B" stroke-width="4" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+        </section>
+
+        <section class="how-section" aria-labelledby="howTitle">
+          <div class="section-heading section-heading-centered">
+            <div>
+              <p class="eyebrow"><span class="eyebrow-dot eyebrow-dot-coral"></span>How it works</p>
+              <h2 id="howTitle">Three little steps</h2>
+            </div>
+          </div>
+          <div class="how-grid">
+            <article class="how-card">
+              <span class="step-number">1</span>
+              <span class="how-icon how-icon-yellow" aria-hidden="true"><svg class="icon"><use href="#icon-book"></use></svg></span>
+              <h3>Pick a cover</h3>
+              <p>All three stories are standing on the shelf, waiting for a reader.</p>
+            </article>
+            <article class="how-card">
+              <span class="step-number">2</span>
+              <span class="how-icon how-icon-coral" aria-hidden="true"><svg class="icon"><use href="#icon-sparkles"></use></svg></span>
+              <h3>Tap the sparkly spots</h3>
+              <p>Every picture hides a tiny page. Tap the glowing dots to find out what is inside.</p>
+            </article>
+            <article class="how-card">
+              <span class="step-number">3</span>
+              <span class="how-icon how-icon-teal" aria-hidden="true"><svg class="icon"><use href="#icon-arrow-right"></use></svg></span>
+              <h3>Turn the page</h3>
+              <p>Use the big buttons at the bottom when you are ready for what happens next.</p>
+            </article>
+          </div>
+        </section>
+
+        <footer class="site-footer">
+          <div class="footer-signature">
+            <span class="brand-mark brand-mark-small" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-rocket"></use></svg></span>
+            <p><strong>Story Rocket</strong> — made for reading together.</p>
+          </div>
+          <p class="footer-note">No ads. No accounts. Just stories.</p>
+        </footer>
+      </main>
+    </div>
+
+    <section class="reader-view" id="readerView" aria-label="Story reader" hidden>
+      <header class="reader-bar">
+        <button class="reader-back" id="backToShelf" aria-label="Back to the bookshelf">
+          <svg class="icon" aria-hidden="true"><use href="#icon-arrow-left"></use></svg>
+          <span>Shelf</span>
+        </button>
+        <div class="reader-book-id">
+          <p class="reader-brand">Story Rocket</p>
+          <p id="readerBookTitle">Johnny Builds to Mars</p>
+        </div>
+        <div class="reader-actions">
+          <button class="reader-action" id="readAloud" aria-pressed="false">
+            <svg class="icon" aria-hidden="true"><use href="#icon-speaker"></use></svg>
+            <span class="reader-action-label">Read to me</span>
+          </button>
+          <button class="reader-action reader-sound" id="soundToggle" aria-pressed="true" aria-label="Turn sound off" title="Turn sound off">
+            <svg class="icon" aria-hidden="true"><use href="#icon-music"></use></svg>
+          </button>
+        </div>
+      </header>
+
+      <main class="reader-main">
+        <div class="reader-stars" aria-hidden="true">
+          <span class="sky-star sky-star-a"></span>
+          <span class="sky-star sky-star-b"></span>
+          <span class="sky-star sky-star-c"></span>
+          <span class="sky-star sky-star-d"></span>
+          <span class="sky-star sky-star-e"></span>
+          <span class="sky-orbit"></span>
+          <span class="sky-planet"></span>
+        </div>
+
+        <div class="book-shell">
+          <div class="book-page" id="bookPage">
+            <div class="page-art-column">
+              <div class="page-art-frame">
+                <div class="page-art" id="pageArt"></div>
+                <div class="hotspots" id="hotspots"></div>
+                <div class="art-hint" id="artHint">
+                  <svg class="icon" aria-hidden="true"><use href="#icon-sparkles"></use></svg>
+                  <span>Tap the glowing dots</span>
+                </div>
+              </div>
+            </div>
+            <div class="page-copy-column">
+              <div class="copy-topline">
+                <p class="page-kicker" id="pageKicker">Chapter One</p>
+                <p class="page-count-chip" id="pageCountChip">1 / 8</p>
+              </div>
+              <h1 class="page-title" id="pageTitle"></h1>
+              <p class="page-text" id="pageText"></p>
+              <div class="copy-rule" aria-hidden="true">
+                <span></span><svg class="icon"><use href="#icon-star"></use></svg><span></span>
+              </div>
+              <p class="copy-note">
+                <svg class="icon" aria-hidden="true"><use href="#icon-sparkles"></use></svg>
+                <span>Glowing dots hide tiny pages.</span>
+              </p>
+              <div class="end-stamp" id="endStamp" hidden>The End</div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="reader-nav">
+        <button class="turn-button turn-prev" id="prevBtn" aria-label="Go to the previous page">
+          <svg class="icon" aria-hidden="true"><use href="#icon-arrow-left"></use></svg>
+          <span>Back</span>
+        </button>
+        <div class="page-status">
+          <div class="page-dots" id="pageDots" aria-label="Choose a page"></div>
+          <div class="progress-track" aria-hidden="true"><span id="progressFill"></span></div>
+          <p class="found-line">
+            <svg class="icon" aria-hidden="true"><use href="#icon-star"></use></svg>
+            <span id="foundLine">0 tiny pages found</span>
+          </p>
+        </div>
+        <button class="turn-button turn-next" id="nextBtn">
+          <span id="nextLabel">Next page</span>
+          <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"></use></svg>
+        </button>
+      </footer>
+    </section>
+  </div>
+
+  <div class="tiny-backdrop" id="tinyBackdrop" hidden></div>
+  <div class="tiny-page" id="tinyPage" role="dialog" aria-modal="true" aria-labelledby="tinyTitle" hidden>
+    <span class="tape tape-one" aria-hidden="true"></span>
+    <span class="tape tape-two" aria-hidden="true"></span>
+    <button class="tiny-close" id="tinyClose" aria-label="Close tiny page">
+      <svg class="icon" aria-hidden="true"><use href="#icon-close"></use></svg>
+    </button>
+    <div class="tiny-doodle" id="tinyDoodle" aria-hidden="true"></div>
+    <p class="tiny-kicker" id="tinyKicker">A tiny page</p>
+    <h2 id="tinyTitle">Surprise</h2>
+    <p class="tiny-text" id="tinyText"></p>
+    <button class="tiny-done" id="tinyDone">Back to the story</button>
+  </div>
+
+  <div class="fx-layer" id="fxLayer" aria-hidden="true"></div>
+  <p class="sr-only" id="liveRegion" aria-live="polite"></p>
+
+  <noscript>
+    <div class="noscript">Story Rocket needs JavaScript to turn the pages. Please turn it on and refresh.</div>
+  </noscript>
+
+  <script src="js/art-kit.js" defer></script>
+  <script src="js/book-johnny.js" defer></script>
+  <script src="js/book-luna.js" defer></script>
+  <script src="js/book-dragon.js" defer></script>
+  <script src="js/app.js" defer></script>
+</body>
+</html>
